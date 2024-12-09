@@ -70,6 +70,8 @@ Ensure `ffmpeg` is installed and available in your system PATH.
 
   Download the static build from the [ffmpeg website](https://ffmpeg.org/download.html#build-windows) and add it to your PATH.
 
+__Note: I have not tested this application on Windows or MacOS.__
+
 ### 4. Set Up Model Weights
 
 Download the required model weights and place them in the appropriate directory. For example, for the `SpandrelProcessor`:
