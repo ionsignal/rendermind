@@ -1,3 +1,5 @@
+![RenderMind](logo.png)
+
 # Rendermind Video Processing Pipeline
 
 An efficient, GPU-accelerated framework for processing videos at the frame level using customizable pipelines, designed to leverage multiple GPUs for high performance.
@@ -70,7 +72,7 @@ Ensure `ffmpeg` is installed and available in your system PATH.
 
   Download the static build from the [ffmpeg website](https://ffmpeg.org/download.html#build-windows) and add it to your PATH.
 
-__Note: I have not tested this application on Windows or MacOS.__
+**Note: I have not tested this application on Windows or MacOS.**
 
 ### 4. Set Up Model Weights
 
