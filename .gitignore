@@ -38,5 +38,5 @@ env/
 *.tmp
 
 # Other
-weights
+weights/*
 *.mp4
