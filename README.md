@@ -72,7 +72,7 @@ Ensure `ffmpeg` is installed and available in your system PATH.
 
   Download the static build from the [ffmpeg website](https://ffmpeg.org/download.html#build-windows) and add it to your PATH.
 
-**Note: I have not tested this application on Windows or MacOS.**
+**Note: This application has not been tested on Windows or MacOS. (planned for future releases)**
 
 ### 4. Set Up Model Weights
 
