@@ -1,12 +1,12 @@
 ![RenderMind](logo.png)
 
-# Rendermind Video Processing Pipeline
+# Rendermind Video Processing and Generation Pipeline
 
-An efficient, GPU-accelerated framework for processing videos at the frame level using customizable pipelines, designed to leverage multiple GPUs for high performance.
+An efficient, GPU-accelerated framework for processing and generating videos at the frame level using customizable pipelines, designed to leverage multiple GPUs for high performance.
 
 ## Overview
 
-Rendermind provides a flexible and extensible architecture for video processing, allowing you to define custom pipelines composed of multiple "processors," such as upscalers, denoisers, and more. Each processor can be configured independently, and the pipeline can be distributed across multiple GPUs for faster processing.
+Rendermind provides a flexible and extensible architecture for both video processing and generative text-to-video frame generation. It allows you to define custom pipelines composed of multiple "processors," such as upscalers, denoisers, and generative models. Each processor can be configured independently, and the pipeline can be distributed across multiple GPUs for faster processing.
 
 ## Key Features
 
@@ -15,6 +15,7 @@ Rendermind provides a flexible and extensible architecture for video processing,
 - **Scalable Tiling Mechanism**: Efficiently process high-resolution frames using tiling to manage GPU memory constraints.
 - **Graceful Shutdown and Interrupt Handling**: Safely handle termination signals to prevent data loss and ensure proper resource cleanup.
 - **Extensible Framework**: Easily add new processors by inheriting from base classes.
+- **Text-to-Video Frame Generation**: Generate video frames from text prompts using configurable generative models.
 
 ## Table of Contents
 
@@ -23,6 +24,8 @@ Rendermind provides a flexible and extensible architecture for video processing,
 - [Project Structure](#project-structure)
 - [Usage](#usage)
   - [Quick Start](#quick-start)
+  - [Transformation Mode](#transformation-mode)
+  - [Generative Mode](#generative-mode)
   - [Configuring Pipelines](#configuring-pipelines)
   - [Using Multiple GPUs](#using-multiple-gpus)
 - [Adding Custom Processors](#adding-custom-processors)
@@ -122,27 +125,31 @@ rendermind/
 
 ### Quick Start
 
-Below is a minimal example to process a video using the default settings.
+The `main.py` script now supports two modes: `transformation` for video processing and `generative` for text-to-video frame generation.
 
-```python
-from rendermind.video_processor import VideoProcessor
+### Transformation Mode
 
-# Initialize the VideoProcessor with default configuration
-processor = VideoProcessor()
+To process a video using the default settings:
 
-# Paths to your input and output video files
-input_video = 'input_video.mp4'
-output_video = 'output_video.mp4'
-
-# Process the video
-processor.process_video(input_video, output_video)
+```bash
+python src/main.py --mode transformation -i input_video.mp4 -o output_video.mp4
 ```
 
 This will use the default processing pipeline, which includes the `SpandrelProcessor` with default settings.
 
+### Generative Mode
+
+To generate a video from a text prompt:
+
+```bash
+python src/main.py --mode generative -p "A majestic lion walking through a savanna at sunset" -o generated_video.mp4
+```
+
+This will use the configured generative processor to create video frames based on the provided prompt.
+
 ### Configuring Pipelines
 
-To customize the processing pipeline, provide a `pipeline_config` when initializing `VideoProcessor`.
+To customize the processing pipeline, you can either modify the default pipeline configuration in `transformation_manager.py` or provide a custom configuration when initializing the `TransformationManager` class directly (not shown in the quick start). The configuration is a list of dictionaries, where each dictionary defines a processor.
 
 ```python
 pipeline_config = [
@@ -162,7 +169,7 @@ pipeline_config = [
 # Specify devices (e.g., "cuda:0" or "cuda:0,cuda:1")
 devices = "cuda:0"
 
-processor = VideoProcessor(devices=devices, pipeline_config=pipeline_config)
+processor = TransformationManager(devices=devices, pipeline_config=pipeline_config)
 ```
 
 ### Using Multiple GPUs
@@ -172,14 +179,14 @@ To leverage multiple GPUs, list them in the `devices` parameter.
 ```python
 devices = "cuda:0,cuda:1"
 
-processor = VideoProcessor(devices=devices, pipeline_config=pipeline_config)
+processor = TransformationManager(devices=devices, pipeline_config=pipeline_config)
 ```
 
 The `GPUWorkerPool` will automatically distribute frames among the specified GPUs.
 
 ## Adding Custom Processors
 
-To extend the processing capabilities, you can create custom processors.
+To extend the processing capabilities, you can create custom processors by inheriting from the `BaseProcessor` class and implementing the `process` and `get_scale_factor` methods. For generative models, implement the `generate` method.
 
 ## Performance Tips
 
