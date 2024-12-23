@@ -9,7 +9,7 @@ from typing import Dict, List, Optional
 from PIL import Image
 from torchvision import transforms
 
-from .pipeline import ProcessingPipeline
+from .transformation_pipeline import TransformationPipeline
 
 @dataclass
 class WorkerResult:
@@ -31,7 +31,7 @@ class GPUWorker:
     def __init__(
         self,
         device: str,
-        pipeline: ProcessingPipeline,
+        pipeline: TransformationPipeline,
         pool: 'GPUWorkerPool', 
         batch_size: int = 1
     ):
@@ -190,7 +190,7 @@ class GPUWorkerPool:
     def __init__(
         self,
         devices: List[str],
-        pipelines: Dict[str, ProcessingPipeline],
+        pipelines: Dict[str, TransformationPipeline],
         batch_size: int = 1
     ):
         """Initialize GPU worker pool.

@@ -10,14 +10,13 @@ import torch
 import ffmpeg
 
 from typing import Optional, Dict, List, Any
-from safetensors.torch import load_file
 
 from .utils import parse_gpu_devices, timed_execution, format_stats_output
-from .gpu_pool import GPUWorkerPool, WorkerResult
-from .pipeline import ProcessingPipeline
-from .processors.spandrel import SpandrelProcessor
+from .transformation.gpu_pool import GPUWorkerPool, WorkerResult
+from .transformation.transformation_pipeline import TransformationPipeline
+from .transformation.processors.spandrel import SpandrelProcessor
 
-class VideoProcessor:
+class TransformationManager:
     def __init__(
         self,
         devices: Optional[str] = None,
@@ -102,7 +101,7 @@ class VideoProcessor:
     def _create_pipelines(
         self,
         pipeline_config: List[Dict[str, Any]]
-    ) -> Dict[str, ProcessingPipeline]:
+    ) -> Dict[str, TransformationPipeline]:
         """Create processing pipelines for each GPU.
         
         Args:
@@ -125,7 +124,7 @@ class VideoProcessor:
                     )
                     processors.append(processor)
 
-            pipelines[device] = ProcessingPipeline(
+            pipelines[device] = TransformationPipeline(
                 processors=processors,
                 output_device=device
             )

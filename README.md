@@ -95,17 +95,23 @@ The Spandrel library is required for certain processors like `SpandrelProcessor`
 ```
 rendermind/
 ├── src/
-│   └── rendermind/
-│       ├── __init__.py
-│       ├── video_processor.py
-│       ├── pipeline.py
-│       ├── gpu_pool.py
-│       ├── utils/
-│       │   └── tensor_processor.py
-│       └── processors/
-│           ├── __init__.py
-│           ├── base.py
-│           └── spandrel.py
+│   ├── main.py                             # Command-line interface entry point (for testing/dev).
+│   ├── api/                                # Web API layer (Placeholder - not implemented in provided code)
+│   │   ├── app.py                          # Flask/FastAPI application setup.
+│   │   └── routes/                         # API endpoint definitions.
+│   ├── rendermind/                         # Core logic of the application
+│   │   ├── transformation_manager.py       # Manages the video transformation workflow.
+│   │   ├── transformation/                 # Contains transformation-related classes
+│   │   │   ├── gpu_pool.py                 # Manages GPU workers for transformations.
+│   │   │   ├── transformation_pipeline.py  # Defines the processing pipeline for transformations.
+│   │   │   └── processors/                 # Implementations of different image processing transforms
+│   │   │       ├── spandrel.py             # Implements a processor using the Spandrel model library.
+│   │   │       └── base.py                 # Abstract base class for all processors.
+│   │   ├── utils/                          # Utility functions
+│   │   │   ├── tensor_processor.py         # Implements tensor processing functions like tiled scaling and gaussian blur.
+│   │   │   ├── timing.py                   # Provides timing utilities for measuring execution time.
+│   │   │   ├── stats.py                    # Formats processing statistics into a human-readable string.
+│   │   │   └── gpu.py                      # Provides GPU related utility functions.
 ├── weights/
 │   └── [model files]
 ├── requirements.txt

@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from .processors.base import BaseProcessor
 
-class ProcessingPipeline:
+class TransformationPipeline:
     """Manages a sequence of processor transforms for frame processing."""
     
     def __init__(

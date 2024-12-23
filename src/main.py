@@ -2,17 +2,22 @@ import sys
 import traceback
 import argparse
 import torch
-from .rendermind.video_processor import VideoProcessor
+
+from .rendermind.transformation_manager import TransformationManager
 
 def main():
     parser = argparse.ArgumentParser(description="Video upscaling using restoration models")
+    parser.add_argument("--mode", 
+        type=str, 
+        required=False,
+        help="Manager to select (transformation or generative)")
     parser.add_argument("-i", "--input", 
         type=str, 
-        required=True,
+        required=False,
         help="Input video path")
     parser.add_argument("-o", "--output", 
         type=str, 
-        required=True,
+        required=False,
         help="Output video path")
     args = parser.parse_args()
 
@@ -21,7 +26,7 @@ def main():
 
     try:
         # instantiate processor
-        processor = VideoProcessor(
+        processor = TransformationManager(
             devices="cuda:0,cuda:1,cuda:2,cuda:3",
         )
         # process video
@@ -35,6 +40,7 @@ def main():
         print("\nFull stack trace:")
         traceback.print_exc()
         exit_code = 1
+
     finally:
         if torch.cuda.is_available():
             torch.cuda.empty_cache()

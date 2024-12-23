@@ -10,7 +10,7 @@ from threading import Event
 from typing import Optional, Dict, Any
 
 from .base import BaseProcessor
-from ..utils.tensor_processor import tiled_scale
+from ...utils.tensor_processor import tiled_scale
 
 class SpandrelProcessor(BaseProcessor):
     """Spandrel-loaded model processor with built-in tiling support."""
