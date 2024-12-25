@@ -103,6 +103,7 @@ rendermind/
 │   │   ├── app.py                          # Flask/FastAPI application setup.
 │   │   └── routes/                         # API endpoint definitions.
 │   ├── rendermind/                         # Core logic of the application
+│   │   ├── generative/                     # Experimental text-to-video, image-to-video, video-to-video support (wip)
 │   │   ├── transformation_manager.py       # Manages the video transformation workflow.
 │   │   ├── transformation/                 # Contains transformation-related classes
 │   │   │   ├── gpu_pool.py                 # Manages GPU workers for transformations.
