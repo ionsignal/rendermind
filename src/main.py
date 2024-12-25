@@ -4,6 +4,7 @@ import argparse
 import torch
 
 from .rendermind.transformation_manager import TransformationManager
+from .rendermind.generative.generative_pipeline import GenerativePipeline
 
 def main():
     parser = argparse.ArgumentParser(description="Video processing and AI frame generation tool")
@@ -30,31 +31,31 @@ def main():
     exit_code = 0
 
     try:
-        # instantiate processor
-        processor = TransformationManager(
-            devices="cuda:0,cuda:1,cuda:2,cuda:3",
-        )
-
         if args.mode == "transformation":
             if not args.input:
                 parser.error("--input is required for transformation mode")
             if not args.output:
                 parser.error("--output is required for transformation mode")
-            processor.process_video(
+            tm = TransformationManager(
+                devices="cuda:0,cuda:1,cuda:2,cuda:3",
+            )
+            tm.process_video(
                 input_path=args.input,
                 output_path=args.output
             )
         elif args.mode == "generative":
             if not args.prompt:
                 parser.error("--prompt is required for generative mode")
-            raise NotImplementedError
-
+            gm = GenerativePipeline(
+                args=args,
+                devices="cuda:0,cuda:1,cuda:2,cuda:3",
+            )
+            # gm.generate(prompt...TODO)
     except Exception as e:
         print(f"Processing failed with error: {str(e)}")
-        print("\nFull stack trace:")
+        print("\nStack Trace:")
         traceback.print_exc()
         exit_code = 1
-
     finally:
         if torch.cuda.is_available():
             torch.cuda.empty_cache()

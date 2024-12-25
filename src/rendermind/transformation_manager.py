@@ -11,10 +11,10 @@ import ffmpeg
 
 from typing import Optional, Dict, List, Any
 
-from .utils import parse_gpu_devices, timed_execution, format_stats_output
 from .transformation.gpu_pool import GPUWorkerPool, WorkerResult
 from .transformation.transformation_pipeline import TransformationPipeline
 from .transformation.processors.spandrel import SpandrelProcessor
+from .utils import parse_gpu_devices, timed_execution, format_stats_output
 
 class TransformationManager:
     def __init__(
@@ -246,7 +246,7 @@ class TransformationManager:
                     vcodec='libx264',
                     acodec='aac',
                     pix_fmt='yuv420p',
-                    crf=20
+                    crf=12
                 )
             else:
                 stream = ffmpeg.output(
@@ -254,7 +254,7 @@ class TransformationManager:
                     output_path,
                     vcodec='libx264',
                     pix_fmt='yuv420p',
-                    crf=20
+                    crf=12
                 )
             
             stream.overwrite_output().run(capture_stdout=True, capture_stderr=True)
