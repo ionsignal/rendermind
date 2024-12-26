@@ -51,7 +51,7 @@ DENOISE_STRENGTH = 1.0
 BASE_DTYPE = torch.bfloat16
 QUANT_DTYPE = torch.float8_e4m3fn
 PARAMS_TO_KEEP = {"norm", "bias", "time_in", "vector_in", "guidance_in", "txt_in", "img_in"}
-SWAP_DOUBLE_BLOCKS = 0
+SWAP_DOUBLE_BLOCKS = 4
 SWAP_SINGLE_BLOCKS = 0
 OFFLOAD_TXT_IN = False
 OFFLOAD_IMG_IN = False
@@ -301,9 +301,9 @@ def encode_text(text_encoder_1, text_encoder_2, device, offload_device, prompt, 
     else:
         prompt_template_dict = None
 
-    def encode_prompt(prompt, negative_prompt, text_encoder, image_token_selection_expr="::4", image1=None, image2=None, clip_text_override=None):
-        text_inputs = text_encoder.text2tokens(prompt, prompt_template=prompt_template_dict, image1=image1, image2=image2, clip_text_override=clip_text_override)
-        prompt_outputs = text_encoder.encode(text_inputs, prompt_template=prompt_template_dict, image_token_selection_expr=image_token_selection_expr, device=device)
+    def encode_prompt(prompt, negative_prompt, text_encoder):
+        text_inputs = text_encoder.text2tokens(prompt, prompt_template=prompt_template_dict)
+        prompt_outputs = text_encoder.encode(text_inputs, prompt_template=prompt_template_dict, device=device)
         prompt_embeds = prompt_outputs.hidden_state
         attention_mask = prompt_outputs.attention_mask
 
@@ -365,7 +365,6 @@ def encode_text(text_encoder_1, text_encoder_2, device, offload_device, prompt, 
                 )
 
             seq_len = negative_prompt_embeds.shape[1]
-
             negative_prompt_embeds = negative_prompt_embeds.to(
                 dtype=text_encoder.dtype, device=device
             )
@@ -384,7 +383,6 @@ def encode_text(text_encoder_1, text_encoder_2, device, offload_device, prompt, 
                 negative_prompt_embeds = negative_prompt_embeds.view(
                     batch_size * num_videos_per_prompt, seq_len, -1
                 )
-
         else:
             negative_prompt_embeds = None
             negative_attention_mask = None
