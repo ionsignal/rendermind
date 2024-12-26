@@ -33,8 +33,8 @@ MODEL_PATH = "/home/ubuntu/share/comfyui/models/diffusion_models/hunyuan-video-7
 VAE_PATH = "/home/ubuntu/share/comfyui/models/vae/hunyuan-video-vae-bf16.safetensors"
 LLM_PATH = "/home/ubuntu/share/comfyui/models/llm/llava-llama-3-8b-text-encoder-tokenizer"
 CLIP_PATH = "/home/ubuntu/share/comfyui/models/clip/clip-vit-large-patch14"
-PROMPT = "a warmly lit café at night, with hanging spherical Edison bulbs casting a soft golden glow over polished wooden tables and velvet booths, large floor-to-ceiling windows reveal a rainy European street outside where raindrops streak the glass and blurred headlights of passing cars create a dreamy ambiance, the camera zooms slowly on a steaming cup of coffee, next to flickering candles, and pastries."
-NEGATIVE_PROMPT = None # "high contrast, saturated, deformed"
+PROMPT = "a warmly lit café at night, with hanging spherical Edison bulbs casting a soft glow over polished wooden tables and velvet booths, large floor-to-ceiling windows reveal a rainy European street outside where raindrops streak the glass and blurred headlights of passing cars create a dreamy ambiance, the camera zooms slowly on a steaming cup of coffee, next to flickering candles, and pastries."
+NEGATIVE_PROMPT = None
 INPUT_FRAMES_PATH = "/home/ubuntu/share/tests-frames"
 OUTPUT_VIDEO = "output_video.mp4"
 WIDTH = 960
@@ -51,8 +51,10 @@ DENOISE_STRENGTH = 1.0
 BASE_DTYPE = torch.bfloat16
 QUANT_DTYPE = torch.float8_e4m3fn
 PARAMS_TO_KEEP = {"norm", "bias", "time_in", "vector_in", "guidance_in", "txt_in", "img_in"}
-SWAP_DOUBLE_BLOCKS = 4
+SWAP_DOUBLE_BLOCKS = 0
 SWAP_SINGLE_BLOCKS = 0
+OFFLOAD_TXT_IN = False
+OFFLOAD_IMG_IN = False
 
 PROMPT_TEMPLATE_ENCODE = (
     "<|start_header_id|>system<|end_header_id|>\n\nDescribe the image by detailing the color, shape, size, texture, "
@@ -536,13 +538,11 @@ def sample_video(pipeline, text_embeddings, latents, device, offload_device, wid
     for name, param in pipeline.transformer.named_parameters():
         if "single" not in name and "double" not in name:
             param.data = param.data.to(device)
-    dblblocks = SWAP_DOUBLE_BLOCKS
-    snglblocks = SWAP_SINGLE_BLOCKS
     pipeline.transformer.block_swap(
-        dblblocks - 1,
-        snglblocks - 1,
-        offload_txt_in = True,
-        offload_img_in = True,
+        SWAP_DOUBLE_BLOCKS - 1,
+        SWAP_SINGLE_BLOCKS - 1,
+        offload_txt_in = OFFLOAD_TXT_IN,
+        offload_img_in = OFFLOAD_IMG_IN,
     )
 
     gc.collect()

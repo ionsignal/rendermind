@@ -1,6 +1,8 @@
 import torch
 from einops import rearrange
 
+ENHANCE_WEIGHT = 2.0
+
 def get_feta_scores(query, key, num_frames):
     img_q, img_k = query, key
     
@@ -45,7 +47,7 @@ def feta_score(query_image, key_image, head_dim, num_frames):
     num_off_diag = num_frames * num_frames - num_frames
     mean_scores = attn_wo_diag.sum(dim=(1, 2)) / num_off_diag
 
-    enhance_scores = mean_scores.mean() * (num_frames + 4.0)
+    enhance_scores = mean_scores.mean() * (num_frames + ENHANCE_WEIGHT)
     enhance_scores = enhance_scores.clamp(min=1)
 
     return enhance_scores
