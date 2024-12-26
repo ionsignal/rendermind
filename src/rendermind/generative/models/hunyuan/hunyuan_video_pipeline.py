@@ -22,13 +22,14 @@ import inspect
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from diffusers.callbacks import MultiPipelineCallbacks, PipelineCallback
-from diffusers.schedulers import KarrasDiffusionSchedulers
 from diffusers.utils import logging, replace_example_docstring
 from diffusers.utils.torch_utils import randn_tensor
 from diffusers.pipelines.pipeline_utils import DiffusionPipeline
 
 from .modules.models import HYVideoDiffusionTransformer
 from .modules.posemb_layers import get_nd_rotary_pos_embed
+
+from .scheduling_flow_match_discrete import FlowMatchDiscreteScheduler
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
 
@@ -81,7 +82,6 @@ def get_rotary_pos_embed(transformer, latent_video_length, height, width):
             theta_rescale_factor=1,
         )
         return freqs_cos, freqs_sin
-
 
 def rescale_noise_cfg(noise_cfg, noise_pred_text, guidance_rescale=0.0):
     """
@@ -186,21 +186,15 @@ class HunyuanVideoPipeline(DiffusionPipeline):
     def __init__(
         self,
         transformer: HYVideoDiffusionTransformer,
-        scheduler: KarrasDiffusionSchedulers,
+        scheduler: FlowMatchDiscreteScheduler,
         progress_bar_config: Dict[str, Any] = None,
         base_dtype = torch.bfloat16,
     ):
         super().__init__()
 
-        # ==========================================================================================
-        if progress_bar_config is None:
-            progress_bar_config = {}
-        if not hasattr(self, "_progress_bar_config"):
-            self._progress_bar_config = {}
-        self._progress_bar_config.update(progress_bar_config)
+
 
         self.base_dtype = base_dtype
-        # ==========================================================================================
 
         self.register_modules(
             transformer=transformer,
