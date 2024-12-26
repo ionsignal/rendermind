@@ -244,9 +244,8 @@ class MMDoubleStreamBlock(nn.Module):
         txt_q = self.txt_attn_q_norm(txt_q).to(txt_v)
         txt_k = self.txt_attn_k_norm(txt_k).to(txt_v)
 
-        # # feta scores
-        # feta_scores = get_feta_scores(img_q, img_k, frames)
-
+        feta_scores = get_feta_scores(img_q, img_k, frames)
+    
         # Run actual attention.
         q = torch.cat((img_q, txt_q), dim=1)
         k = torch.cat((img_k, txt_k), dim=1)
@@ -267,9 +266,7 @@ class MMDoubleStreamBlock(nn.Module):
         )
 
         img_attn, txt_attn = attn[:, : img.shape[1]], attn[:, img.shape[1] :]
-
-        # # apply feta scores
-        # img_attn *= feta_scores
+        img_attn *= feta_scores
 
         # Calculate the img bloks.
         img = img + apply_gate(self.img_attn_proj(img_attn), gate=img_mod1_gate)
@@ -405,8 +402,7 @@ class MMSingleStreamBlock(nn.Module):
             q = torch.cat((img_q, txt_q), dim=1)
             k = torch.cat((img_k, txt_k), dim=1)
 
-
-        # # feta scores
+        # feta scores
         # feta_scores = get_feta_scores(img_q, img_k, frames)
 
         # Compute attention.
@@ -466,10 +462,10 @@ class MMSingleStreamBlock(nn.Module):
                 batch_size=x.shape[0],
                 attn_mask=attn_mask
             )
-            # attn *= feta_scores
-        
+
             # Compute activation in mlp stream, cat again and run second linear layer.
             output = self.linear2(torch.cat((attn, self.mlp_act(mlp)), 2))
+            # output *= feta_scores
             output = x + apply_gate(output, gate=mod_gate)
             
             return output
