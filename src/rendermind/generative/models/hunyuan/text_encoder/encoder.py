@@ -4,7 +4,7 @@ import torch.nn as nn
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
-from transformers import CLIPTextModel, CLIPTokenizer, AutoTokenizer, AutoModel, AutoProcessor
+from transformers import CLIPTextModel, CLIPTokenizer, AutoTokenizer, AutoModel
 from transformers.utils import ModelOutput
 
 def use_default(value, default):
@@ -138,7 +138,7 @@ class TextEncoder(nn.Module):
         return f"{self.text_encoder_type} ({self.precision} - {self.model_path})"
 
     @staticmethod
-    def apply_text_to_template(text, template, prevent_empty_text=True):
+    def apply_text_to_template(text, template):
         """
         Apply text to template.
 
