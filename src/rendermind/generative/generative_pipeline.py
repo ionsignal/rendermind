@@ -33,20 +33,20 @@ MODEL_PATH = "/home/ubuntu/share/comfyui/models/diffusion_models/hunyuan-video-7
 VAE_PATH = "/home/ubuntu/share/comfyui/models/vae/hunyuan-video-vae-bf16.safetensors"
 LLM_PATH = "/home/ubuntu/share/comfyui/models/llm/llava-llama-3-8b-text-encoder-tokenizer"
 CLIP_PATH = "/home/ubuntu/share/comfyui/models/clip/clip-vit-large-patch14"
-PROMPT = "a warmly lit café at night, with hanging Edison bulbs casting a soft golden glow over polished wooden tables and velvet chairs; large floor-to-ceiling windows reveal a rainy European street outside; where raindrops streak the glass and blurred headlights of passing cars create a dreamy ambiance; the camera pans across the cozy interior, focusing on details like a steaming cup of coffee; flickering candles, and pastries under glass domes; reflections of rain and city lights shimmer on the café’s polished floor, contrasting the inviting warmth inside with the cool, wet night outside"
-NEGATIVE_PROMPT = "high contrast, saturated, deformed"
+PROMPT = "a warmly lit café at night, with hanging spherical Edison bulbs casting a soft golden glow over polished wooden tables and velvet booths, large floor-to-ceiling windows reveal a rainy European street outside where raindrops streak the glass and blurred headlights of passing cars create a dreamy ambiance, the camera zooms slowly on a steaming cup of coffee, next to flickering candles, and pastries."
+NEGATIVE_PROMPT = None # "high contrast, saturated, deformed"
 INPUT_FRAMES_PATH = "/home/ubuntu/share/tests-frames"
 OUTPUT_VIDEO = "output_video.mp4"
 WIDTH = 960
 HEIGHT = 544
-NUM_FRAMES = 33
-STEPS = 40
+NUM_FRAMES = 35
+STEPS = 30
 CFG_SCALE = 1.0
 CFG_SCALE_START = 0.9
 CFG_SCALE_END = 1.0
 EMBEDDED_GUIDANCE_SCALE = 5.0
-FLOW_SHIFT = 9.0
-SEED = 0
+FLOW_SHIFT = 5.0
+SEED = 348273
 DENOISE_STRENGTH = 1.0
 BASE_DTYPE = torch.bfloat16
 QUANT_DTYPE = torch.float8_e4m3fn
@@ -146,7 +146,7 @@ def load_vae(vae_path, device, offload_device, precision):
         dtype = {"bf16": torch.bfloat16, "fp16": torch.float16, "fp32": torch.float32}[precision]
 
         script_directory = os.path.dirname(os.path.abspath(__file__))
-        vae_config = os.path.join(script_directory, "models/hunyuan/config/fp8_map.safetensors")
+        vae_config = os.path.join(script_directory, "models/hunyuan/config/hy_vae_config.json")
 
         # Load VAE configuration
         with open(vae_config, 'r') as f:
@@ -315,40 +315,8 @@ def encode_text(text_encoder_1, text_encoder_2, device, offload_device, prompt, 
 
         prompt_embeds = prompt_embeds.to(dtype=text_encoder.dtype, device=device)
 
-        # if cfg_scale > 1.0:
-        #     uncond_tokens: List[str]
-
-        #     if negative_prompt is None:
-        #         uncond_tokens = [""]
-        #     elif isinstance(negative_prompt, str):
-        #         uncond_tokens = [negative_prompt]
-        #     else:
-        #         uncond_tokens = negative_prompt
-
-        #     uncond_input = text_encoder.text2tokens(uncond_tokens, prompt_template=prompt_template_dict)
-        #     negative_prompt_outputs = text_encoder.encode(
-        #         uncond_input, prompt_template=prompt_template_dict, device=device
-        #     )
-
-        #     negative_prompt_embeds = negative_prompt_outputs.hidden_state
-        #     negative_attention_mask = negative_prompt_outputs.attention_mask
-
-        #     if negative_attention_mask is not None:
-        #         negative_attention_mask = negative_attention_mask.to(device)
-        #         _, seq_len = negative_attention_mask.shape
-        #         # negative_attention_mask = negative_attention_mask.repeat(
-        #         #     1, 1
-        #         # )
-        #         negative_attention_mask = negative_attention_mask.view(
-        #             1, seq_len
-        #         )
-        # else:
-        #     negative_prompt_embeds = None
-        #     negative_attention_mask = None
-
         batch_size = 1
         num_videos_per_prompt = 1
-
         if cfg_scale > 1.0:
             print('encoding negative prompt')
             uncond_tokens: List[str]
@@ -577,10 +545,10 @@ def sample_video(pipeline, text_embeddings, latents, device, offload_device, wid
         offload_img_in = True,
     )
 
-    pipeline.transformer.to(device)
-
     gc.collect()
     soft_empty_cache()
+
+    pipeline.transformer.to(device)
 
     out_latents = pipeline(
         num_inference_steps=steps,
