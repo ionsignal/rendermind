@@ -4,6 +4,10 @@
 
 An efficient, GPU-accelerated framework for processing and generating videos at the frame level using customizable pipelines, designed to leverage multiple GPUs for high performance.
 
+## News
+
+* Dec 27, 2024: This project has been moved to Diffusify Engine ([diffusify-engine](https://github.com/diffusify/diffusify-engine))
+
 ## Overview
 
 Rendermind provides a flexible and extensible architecture for both video processing and generative text-to-video frame generation. It allows you to define custom pipelines composed of multiple "processors," such as upscalers, denoisers, and generative models. Each processor can be configured independently, and the pipeline can be distributed across multiple GPUs for faster processing.
